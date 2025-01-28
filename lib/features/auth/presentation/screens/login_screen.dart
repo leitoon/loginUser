@@ -9,89 +9,120 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     final size = MediaQuery.of(context).size;
     final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
 
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-          body: GeometricalBackground(
-              child: SingleChildScrollView(
-        physics: const ClampingScrollPhysics(),
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 80, // todo: aquí iba 80 que colocó Fernando originalmente
+        body: GeometricalBackground( 
+          child: SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox( height: 80 ),
+                // Icon Banner
+                const Icon( 
+                  Icons.production_quantity_limits_rounded, 
+                  color: Colors.white,
+                  size: 100,
+                ),
+                const SizedBox( height: 80 ),
+    
+                Container(
+                  height: size.height - 260, // 80 los dos sizebox y 100 el ícono
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: scaffoldBackgroundColor,
+                    borderRadius: const BorderRadius.only(topLeft: Radius.circular(100)),
+                  ),
+                  child: const _LoginForm(),
+                )
+              ],
             ),
-            // Icon Banner
-            const Icon(
-              Icons.production_quantity_limits_rounded,
-              color: Colors.white,
-              size: 100,
-            ),
-            const SizedBox(height: 80),
-
-            Container(
-              height: size.height - 260, // 80 los dos sizebox y 100 el ícono
-              decoration: BoxDecoration(
-                color: scaffoldBackgroundColor,
-                borderRadius:
-                    const BorderRadius.only(topLeft: Radius.circular(100)),
-              ),
-              child: const _LoginForm(),
-            )
-          ],
-        ),
-      ))),
+          )
+        )
+      ),
     );
   }
 }
 
 class _LoginForm extends ConsumerWidget {
+
   const _LoginForm();
+
+  void showSnackbar( BuildContext context, String message ) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message))
+    );
+  }
+
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
     final loginForm = ref.watch(loginFormProvider);
+
     final textStyles = Theme.of(context).textTheme;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 50),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          Text('Login', style: textStyles.titleLarge),
-           CustomTextFormField(
+          const SizedBox( height: 50 ),
+          Text('Login', style: textStyles.titleLarge ),
+          const SizedBox( height: 90 ),
+
+          CustomTextFormField(
             label: 'Correo',
             keyboardType: TextInputType.emailAddress,
-            onChanged: ref.read(loginFormProvider.notifier).onEmailChange ,
-            errorMessage: loginForm.isPosting ? loginForm.email.errorMessage : null,
+            onChanged: ref.read(loginFormProvider.notifier).onEmailChange,
+            errorMessage: loginForm.isFormPosted ?
+               loginForm.email.errorMessage 
+               : null,
           ),
-           CustomTextFormField(
+          const SizedBox( height: 30 ),
+
+          CustomTextFormField(
             label: 'Contraseña',
-            onChanged: ref.read(loginFormProvider.notifier).onPasswordChanged ,
-            errorMessage:loginForm.isPosting ?loginForm.password.errorMessage:null,
             obscureText: true,
+            onChanged: ref.read(loginFormProvider.notifier).onPasswordChanged,
+            errorMessage: loginForm.isFormPosted ?
+               loginForm.password.errorMessage 
+               : null,
           ),
+    
+          const SizedBox( height: 30 ),
+
           SizedBox(
-              width: double.infinity,
-              height: 60,
-              child: CustomFilledButton(
-                text: 'Ingresar',
-                buttonColor: Colors.black,
-                onPressed: () {
-                  ref.read(loginFormProvider.notifier).onFormSubmit();
-                },
-              )),
+            width: double.infinity,
+            height: 60,
+            child: CustomFilledButton(
+              text: 'Ingresar',
+              buttonColor: Colors.black,
+              onPressed: (){
+                ref.read(loginFormProvider.notifier).onFormSubmit();
+              },
+            )
+          ),
+
+          const Spacer( flex: 2 ),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text('¿No tienes cuenta?'),
               TextButton(
-                  onPressed: () => context.push('/register'),
-                  child: const Text('Crea una aquí'))
+                onPressed: ()=> context.push('/register'), 
+                child: const Text('Crea una aquí')
+              )
             ],
           ),
+
+          const Spacer( flex: 1),
         ],
       ),
     );

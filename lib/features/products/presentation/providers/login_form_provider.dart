@@ -4,6 +4,7 @@ import 'package:formz/formz.dart';
 import '../../../shared/shared.dart';
 
   final loginFormProvider = StateNotifierProvider.autoDispose<LoginFormNotifier, LoginFormSate >((ref){
+    
     return LoginFormNotifier();
   });
 
@@ -21,6 +22,7 @@ import '../../../shared/shared.dart';
   onPasswordChanged(String value){
     final newPassword = Password.dirty(value);
     state = state.copyWith(
+      
       password: newPassword,
       isValid: Formz.validate([newPassword, state.email])
     );
