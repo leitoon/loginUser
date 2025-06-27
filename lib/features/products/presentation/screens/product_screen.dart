@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:teslo_shop/features/products/domain/domain.dart';
 import 'package:teslo_shop/features/products/presentation/providers/product_provider.dart';
+import 'package:teslo_shop/features/products/presentation/providers/providers.dart';
 import 'package:teslo_shop/features/shared/shared.dart';
 
 
@@ -36,14 +37,15 @@ class ProductScreen extends ConsumerWidget {
   }
 }
 
-class _ProductView extends StatelessWidget {
+class _ProductView extends ConsumerWidget {
 
   final Product product;
 
   const _ProductView({required this.product});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final productForm = ref.watch(productFormProvider(product));
 
     final textStyles = Theme.of(context).textTheme;
 
@@ -57,7 +59,7 @@ class _ProductView extends StatelessWidget {
           ),
     
           const SizedBox( height: 10 ),
-          Center(child: Text( product.title, style: textStyles.titleSmall )),
+          Center(child: Text( productForm.title.value, style: textStyles.titleSmall )),
           const SizedBox( height: 10 ),
           _ProductInformation( product: product ),
           
@@ -73,7 +75,7 @@ class _ProductInformation extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref ) {
-
+    final productForm = ref.watch(productFormProvider(product));
     
 
     return Padding(
@@ -86,18 +88,26 @@ class _ProductInformation extends ConsumerWidget {
           CustomProductField( 
             isTopField: true,
             label: 'Nombre',
-            initialValue: product.title,
+            initialValue: productForm.slug.value,
+            onChanged: ref.read(productFormProvider(product).notifier).onSlugChanged,
+            errorMessage: productForm.title.errorMessage,
           ),
           CustomProductField( 
-            isTopField: true,
+            //isTopField: true,
             label: 'Slug',
-            initialValue: product.slug,
+            
+            initialValue: productForm.slug.value,
+            onChanged: ref.read(productFormProvider(product).notifier).onTitleChanged,
+            errorMessage: productForm.slug.errorMessage,
           ),
           CustomProductField( 
             isBottomField: true,
             label: 'Precio',
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            initialValue: product.price.toString(),
+            
+            initialValue: productForm.price.value.toString(),
+            onChanged: (value) => ref.read(productFormProvider(product).notifier).onPriceChanged(double.tryParse(value)?? 0),
+            errorMessage: productForm.price.errorMessage,
           ),
 
           const SizedBox(height: 15 ),
